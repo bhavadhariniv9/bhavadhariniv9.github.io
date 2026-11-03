@@ -1,0 +1,41 @@
+---
+import '../styles/global.css';
+import { loadSite } from '../lib';
+import Profile from '../components/Profile.astro';
+import TabNav from '../components/TabNav.astro';
+interface Props { tabs: { id: string; label: string; href: string }[]; current: string; title?: string }
+const { tabs, current, title } = Astro.props;
+const site = loadSite();
+const pageTitle = title && title !== tabs[0]?.label ? `${title} · ${site.tagline ?? site.name}` : (site.tagline ?? site.name);
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="theme-color" content="#faf2e3" />
+    <link rel="canonical" href={Astro.url.href} />
+  </head>
+  <body>
+    <div class="wrap">
+      <Profile />
+      <hr class="rule" />
+      <TabNav tabs={tabs} current={current} />
+      <main class="content"><slot /></main>
+    </div>
+    <script>
+      // [+] Synopsis toggles
+      document.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.syn-toggle');
+        if (!btn) return;
+        const panel = btn.closest('.item')?.querySelector<HTMLElement>('.synopsis');
+        if (!panel) return;
+        const open = panel.hidden;
+        panel.hidden = !open;
+        btn.setAttribute('aria-expanded', String(open));
+        btn.textContent = open ? '[−] Synopsis' : '[+] Synopsis';
+      });
+    </script>
+  </body>
+</html>

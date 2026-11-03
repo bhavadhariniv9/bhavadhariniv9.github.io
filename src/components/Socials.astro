@@ -1,0 +1,15 @@
+---
+import { loadSite, asset } from '../lib';
+const { socials } = loadSite();
+const external = (u: string) => /^https?:/i.test(u);
+---
+<ul class="socials">
+  {socials.map((s) => (
+    <li>
+      <a href={s.url} aria-label={s.label} title={s.label}
+         {...(external(s.url) ? { target: '_blank', rel: 'noopener' } : {})}>
+        <img src={asset(s.icon)} alt={s.label} />
+      </a>
+    </li>
+  ))}
+</ul>

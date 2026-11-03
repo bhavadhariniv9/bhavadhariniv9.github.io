@@ -1,0 +1,17 @@
+/* Change the look of the whole site here. */
+@import '@fontsource/jetbrains-mono/500.css';
+@import '@fontsource/jetbrains-mono/800.css';
+@import '@fontsource/hanken-grotesk/300.css';
+@import '@fontsource/hanken-grotesk/400.css';
+
+:root {
+  --bg: #faf2e3;
+  --ink: #111111;
+  --accent: #de8b65;
+
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  --font-body: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --page-width: 1100px;
+  --gutter: clamp(20px, 5vw, 60px);
+}

@@ -1,0 +1,95 @@
+---
+import { asset } from '../lib';
+interface Props { tabs: { id: string; label: string; href: string }[]; current: string }
+const { tabs, current } = Astro.props;
+---
+<nav class="tabs" aria-label="Pages">
+  <button class="arrow" data-dir="-1" aria-label="Scroll tabs left" type="button">&lt;</button>
+  <div class="tabs-scroll">
+    {tabs.map((t) => (
+      <a class="tab" href={t.href} aria-current={t.id === current ? 'page' : undefined}>{t.label}</a>
+    ))}
+  </div>
+  <button class="arrow" data-dir="1" aria-label="Scroll tabs right" type="button">&gt;</button>
+</nav>
+
+<script>
+  const nav = document.querySelector<HTMLElement>('.tabs')!;
+  const strip = nav.querySelector<HTMLElement>('.tabs-scroll')!;
+  const [left, right] = nav.querySelectorAll<HTMLButtonElement>('.arrow');
+
+  const update = () => {
+    const over = strip.scrollWidth > strip.clientWidth + 1;
+    nav.classList.toggle('overflowing', over);
+    left.disabled = strip.scrollLeft <= 1;
+    right.disabled = strip.scrollLeft + strip.clientWidth >= strip.scrollWidth - 1;
+  };
+  nav.querySelectorAll<HTMLButtonElement>('.arrow').forEach((b) =>
+    b.addEventListener('click', () =>
+      strip.scrollBy({ left: Number(b.dataset.dir) * strip.clientWidth * 0.6 })));
+  strip.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+  strip.querySelector('[aria-current="page"]')?.scrollIntoView({ inline: 'center', block: 'nearest' });
+  update();
+</script>
+
+<script>
+  // ── Swap only the content area when a tab is clicked (header + tab bar stay put) ──
+  const main = document.querySelector<HTMLElement>('main.content')!;
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('.tab')];
+  const cache = new Map<string, Promise<{ html: string; title: string }>>();
+
+  const load = (url: string) => {
+    if (!cache.has(url)) {
+      cache.set(url, fetch(url).then(async (r) => {
+        if (!r.ok) throw new Error(String(r.status));
+        const doc = new DOMParser().parseFromString(await r.text(), 'text/html');
+        return { html: doc.querySelector('main.content')!.innerHTML, title: doc.title };
+      }).catch((e) => { cache.delete(url); throw e; }));
+    }
+    return cache.get(url)!;
+  };
+  const key = (u: string) => new URL(u, location.href).pathname;
+
+  const setActive = (path: string) => {
+    links.forEach((a) => {
+      if (key(a.href) === path) a.setAttribute('aria-current', 'page');
+      else a.removeAttribute('aria-current');
+    });
+    links.find((a) => a.getAttribute('aria-current'))
+      ?.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth' });
+  };
+
+  let token = 0;
+  async function show(url: string, push: boolean) {
+    const me = ++token;
+    const path = key(url);
+    setActive(path);                       // underline moves immediately
+    main.classList.add('swapping');        // fade out
+    try {
+      const [page] = await Promise.all([load(url), new Promise((r) => setTimeout(r, 140))]);
+      if (me !== token) return;            // a newer click won
+      main.innerHTML = page.html;
+      document.title = page.title;
+      if (push) history.pushState({ tab: true }, '', url);
+    } catch {
+      location.href = url;                 // fall back to a normal page load
+      return;
+    }
+    requestAnimationFrame(() => main.classList.remove('swapping'));
+  }
+
+  links.forEach((a) => {
+    a.addEventListener('click', (e) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+      e.preventDefault();
+      if (key(a.href) !== location.pathname) show(a.href, true);
+    });
+    const warm = () => load(a.href).catch(() => {});
+    a.addEventListener('pointerenter', warm, { once: true });
+    a.addEventListener('touchstart', warm, { once: true, passive: true });
+  });
+  window.addEventListener('popstate', () => show(location.href, false));
+  // prefetch the other tabs once the browser is idle so switching feels instant
+  (window.requestIdleCallback ?? setTimeout)(() => links.forEach((a) => load(a.href).catch(() => {})));
+</script>

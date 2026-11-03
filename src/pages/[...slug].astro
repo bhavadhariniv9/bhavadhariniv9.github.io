@@ -1,0 +1,32 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import { loadSite, asset } from '../lib';
+
+export async function getStaticPaths() {
+  const site = loadSite();
+  const entries = await getCollection('pages');
+  const byId = new Map(entries.map((e) => [e.id, e]));
+
+  const missing = site.pages.filter((id) => !byId.has(id));
+  if (missing.length)
+    throw new Error(`content/site.yaml lists pages with no file in content/pages/: ${missing.join(', ')}`);
+
+  const tabs = site.pages.map((id, i) => ({
+    id,
+    label: byId.get(id)!.data.title ?? id,
+    href: asset(i === 0 ? '' : `${id}/`),
+  }));
+
+  return site.pages.map((id, i) => ({
+    params: { slug: i === 0 ? undefined : id },
+    props: { entry: byId.get(id)!, tabs, current: id },
+  }));
+}
+
+const { entry, tabs, current } = Astro.props;
+const { Content } = await render(entry);
+---
+<Layout tabs={tabs} current={current} title={entry.data.title}>
+  <Content />
+</Layout>

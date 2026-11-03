@@ -1,0 +1,92 @@
+@import './tokens.css';
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.4rem);
+  line-height: 1.65;
+}
+a { color: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:hover { color: var(--accent); }
+img { max-width: 100%; }
+.wrap { max-width: var(--page-width); margin: 0 auto; padding: 0 var(--gutter); }
+
+/* ── header ─────────────────────────────── */
+.profile { display: flex; justify-content: space-between; align-items: flex-start; gap: 2rem; padding-top: clamp(28px, 6vw, 90px); }
+.profile-text { flex: 1 1 0; max-width: 34em; }
+.profile h1 {
+  font-family: var(--font-mono); font-weight: 800; margin: 0 0 .4em;
+  font-size: clamp(2rem, 1.2rem + 3.5vw, 4.2rem); line-height: 1.1; letter-spacing: -.02em;
+}
+.bio p { margin: 0; }
+.profile-side { display: flex; flex-direction: column; align-items: center; gap: 1.2rem; flex: 0 0 auto; }
+.photo {
+  width: clamp(140px, 22vw, 320px); aspect-ratio: 318 / 500; object-fit: cover; display: block;
+  border: 10px solid var(--accent); border-radius: 999px;
+}
+.socials { display: flex; gap: 1.3rem; list-style: none; margin: 0; padding: 0; }
+.socials a { display: block; width: 44px; height: 44px; }
+.socials img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; transition: transform .15s; }
+.socials a:hover img { transform: translateY(-2px) scale(1.06); }
+
+hr.rule { border: 0; border-top: 1px solid var(--ink); margin: clamp(24px, 4vw, 60px) 0 0; }
+
+/* ── tabs ───────────────────────────────── */
+.tabs { display: flex; align-items: center; justify-content: center; gap: .5rem; padding: 1.1rem 0 .4rem; }
+.tabs-scroll {
+  display: flex; gap: clamp(1.2rem, 4vw, 3rem); overflow-x: auto; scroll-behavior: smooth;
+  scrollbar-width: none; padding: .3rem .4rem .5rem; max-width: 100%;
+}
+.tabs-scroll::-webkit-scrollbar { display: none; }
+.tab {
+  font-family: var(--font-mono); font-weight: 500; font-size: clamp(1.4rem, 1rem + 1.8vw, 2.5rem);
+  text-decoration: none; white-space: nowrap; padding-bottom: .1em; border-bottom: 3px solid transparent;
+}
+.tab:hover { color: var(--accent); }
+.tab[aria-current='page'] { border-bottom-color: var(--accent); }
+.arrow {
+  font-family: var(--font-mono); font-size: clamp(1.4rem, 1rem + 1.4vw, 2rem); background: none; border: 0; color: var(--ink);
+  cursor: pointer; padding: .2rem .6rem; line-height: 1; flex: none;
+}
+.arrow[hidden] { display: none; }
+.arrow:hover:not(:disabled) { color: var(--accent); }
+.arrow:disabled { opacity: .25; cursor: default; }
+.tabs:not(.overflowing) .arrow { display: none; }
+
+/* ── page content ───────────────────────── */
+.content { max-width: 52rem; margin: clamp(20px, 3vw, 40px) auto 5rem; counter-reset: item; }
+.content h2 { font-family: var(--font-mono); font-weight: 500; font-size: 1.4em; margin: 1.6em 0 .4em; }
+.content p { margin: .8em 0; }
+.content ul, .content ol { padding-left: 1.3em; }
+
+.content { transition: opacity .16s ease, transform .16s ease; }
+.content.swapping { opacity: 0; transform: translateY(6px); }
+@media (prefers-reduced-motion: reduce) { .content { transition: none; } }
+
+.item { counter-increment: item; position: relative; padding-left: 2em; margin: 1.6em 0; }
+.item::before { content: counter(item) '.'; position: absolute; left: 0; top: 0; }
+.item .item-title { margin: 0; font-weight: 400; }
+.item .item-meta { margin: 0; }
+.item-actions { display: flex; flex-wrap: wrap; gap: .3em 1em; margin-top: .2em; }
+.syn-toggle {
+  font: inherit; background: none; border: 0; padding: 0; cursor: pointer; color: inherit;
+}
+.syn-toggle:hover { color: var(--accent); }
+.item-link { text-decoration: underline; }
+.synopsis { margin-top: .6em; padding-left: 1em; border-left: 3px solid var(--accent); font-size: .92em; }
+.synopsis[hidden] { display: none; }
+.synopsis > :first-child { margin-top: 0; } .synopsis > :last-child { margin-bottom: 0; }
+
+/* ── phones ─────────────────────────────── */
+@media (max-width: 680px) {
+  .profile { flex-direction: column-reverse; align-items: center; text-align: left; gap: 1.4rem; padding-top: 28px; }
+  .profile-text { max-width: none; width: 100%; }
+  .photo { width: 150px; border-width: 7px; }
+  .socials a { width: 40px; height: 40px; }
+  .item { padding-left: 1.7em; }
+}

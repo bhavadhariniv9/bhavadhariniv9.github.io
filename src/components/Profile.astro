@@ -1,0 +1,18 @@
+---
+import { getEntry, render } from 'astro:content';
+import { loadSite, asset } from '../lib';
+import Socials from './Socials.astro';
+const site = loadSite();
+const bio = await getEntry('bio', 'bio');
+const { Content } = bio ? await render(bio) : { Content: null };
+---
+<header class="profile">
+  <div class="profile-text">
+    <h1>{site.name}</h1>
+    <div class="bio">{Content && <Content />}</div>
+  </div>
+  <div class="profile-side">
+    {site.photo && <img class="photo" src={asset(site.photo)} alt={site.name} />}
+    <Socials />
+  </div>
+</header>
