@@ -13,5 +13,5 @@ title: home
 :::edu{school="Indian Institute of Technology Bombay" logo="logos/iitb.png" dates="2026 – Present" degree="Ph.D. in Computer Science and Engineering"}
 :::
 
-:::edu{school="Indian Institute of Science Education and Research, Tirupati" logo="logos/iiser.png"  dates="2019 – 2024" degree="BS MS Dual Degree"}
+:::edu{school="Indian Institute of Science Education and Research, Tirupati" logo="logos/iiser.png"  dates="2019 – 2024" degree="BS MS Dual Degree (Major: Mathematics)"}
 :::
