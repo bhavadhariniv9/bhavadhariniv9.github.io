@@ -4,8 +4,9 @@ import { parse } from 'yaml';
 
 export interface Social { label: string; icon: string; url: string }
 export interface SiteConfig {
-  name: string; tagline?: string; photo?: string;
+  name: string; tagline?: string; photo?: string; nameIcon?: string;
   pages: string[]; socials: Social[];
+  navPosition?: 'top' | 'left' | 'menu';
 }
 
 export function loadSite(): SiteConfig {

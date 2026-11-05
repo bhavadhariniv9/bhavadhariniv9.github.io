@@ -1,5 +1,6 @@
 ---
 title: publication
+heading: Publications
 ---
 
 <!--

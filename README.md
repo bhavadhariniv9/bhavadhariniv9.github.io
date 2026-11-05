@@ -16,6 +16,11 @@ Static site (Astro) → GitHub Pages. You only edit files in `content/` and `pub
 1. Create `content/pages/talks.md` with `---\ntitle: talks\n---` and any markdown.
 2. Add `- talks` to `pages:` in `content/site.yaml`. Done. (More tabs than fit → scroll arrows appear.)
 
+### Page layout
+The first page in `pages:` (home) shows the full header (photo, bio, socials). Every other page is *compact*:
+a big title + orange line, then your content. The title defaults to the tab label with a capital letter;
+set `heading: My Title` in the page's frontmatter to change it, or `compact: false` to give that page the full header.
+
 ## Add a paper / course (inside any page)
 ```md
 :::paper{title="My Paper" authors="w/ A, B" venue="USENIX 2026" pdf="papers/my-paper.pdf" code="https://github.com/..." links="Talk|https://youtu.be/x;Poster|papers/poster.pdf"}
@@ -26,7 +31,7 @@ Synopsis text, **markdown** allowed. Shown under "[+] Synopsis".
 Optional description.
 :::
 ```
-Link keys: `pdf code slides video poster talk url page`, plus `links="Label|url;Label|url"`.
+Link keys: `pdf code slides video poster talk url page`, plus `links="Label|url;Label|url"`. (In a `:::course`, `code` is the course number, so use `url` or `links=` for web links.)
 
 ## Social icons
 In `content/site.yaml`: `icon:` is any image in `public/`, `url:` is a link or `mailto:you@x.com`.

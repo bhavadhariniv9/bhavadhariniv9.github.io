@@ -1,4 +1,4 @@
-// Turns the custom markdown blocks (:::paper, :::course) into HTML,
+// Turns the custom markdown blocks (:::paper, :::course, :::edu, :::exp) into HTML,
 // and prefixes site-relative links with the configured `base`.
 import { visit } from 'unist-util-visit';
 
@@ -28,8 +28,44 @@ export function remarkBlocks({ base = '/' } = {}) {
     });
 
     visit(tree, 'containerDirective', (node) => {
-      if (node.name !== 'paper' && node.name !== 'course') return;
       const a = node.attributes ?? {};
+      if (node.name === 'exp') {
+        // :::exp{role="…" dates="…" supervisor="…" dept="…" topic="…" toggle="Synopsis"}  body = what was done
+        const top = [el('p', 'exp-role', [text(a.role ?? '(role)')])];
+        if (a.dates) top.push(el('p', 'exp-dates', [text(a.dates)]));
+        const kids = [el('div', 'exp-head', top)];
+        const sup = [a.supervisor && `Supervisor: ${a.supervisor}`, a.dept].filter(Boolean).join(', ');
+        if (sup) kids.push(el('p', 'exp-sup', [text(sup)]));
+        if (a.topic) kids.push(el('p', 'exp-topic', [text(a.topic)]));
+        if (node.children.length) {
+          const label = a.toggle ?? 'Synopsis';
+          kids.push(el('div', 'item-actions', [{
+            type: 'paragraph',
+            data: { hName: 'button', hProperties: { class: 'syn-toggle', type: 'button', 'aria-expanded': 'false', 'data-label': label } },
+            children: [text(`[+] ${label}`)],
+          }]));
+          kids.push(el('div', 'synopsis', node.children, { hidden: true }));
+        }
+        node.data = { hName: 'article', hProperties: { class: 'item exp' } };
+        node.children = kids;
+        return;
+      }
+      if (node.name === 'edu') {
+        // :::edu{school="…" logo="logos/x.png" place="…" dates="…" degree="…"}  body = extra lines (scholarships, thesis…)
+        const top = [el('p', 'edu-school', [text(a.school ?? '(school)')])];
+        if (a.dates) top.push(el('p', 'edu-dates', [text(a.dates)]));
+        const kids = [el('div', 'edu-head', top)];
+        if (a.place) kids.push(el('p', 'edu-place', [text(a.place)]));
+        if (a.degree) kids.push(el('p', 'edu-degree', [text(a.degree)]));
+        if (node.children.length) kids.push(el('div', 'edu-body', node.children));
+        const main = el('div', 'edu-main', kids);
+        node.data = { hName: 'article', hProperties: { class: a.logo ? 'edu has-logo' : 'edu' } };
+        node.children = a.logo
+          ? [{ type: 'image', url: fix(a.logo), alt: a.school ?? '', data: { hProperties: { class: 'edu-logo', loading: 'lazy' } } }, main]
+          : [main];
+        return;
+      }
+      if (node.name !== 'paper' && node.name !== 'course') return;
       const kind = node.name;
 
       const head = [el('p', 'item-title', [text(a.title ?? '(untitled)')])];
@@ -51,6 +87,7 @@ export function remarkBlocks({ base = '/' } = {}) {
       }
       for (const [key, label] of Object.entries(LINKS)) {
         if (!a[key]) continue;
+        if (kind === 'course' && key === 'code') continue; // for courses, `code` is the course number, not a link
         actions.push({
           type: 'link',
           url: fix(a[key]),

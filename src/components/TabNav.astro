@@ -4,8 +4,12 @@ interface Props { tabs: { id: string; label: string; href: string }[]; current: 
 const { tabs, current } = Astro.props;
 ---
 <nav class="tabs" aria-label="Pages">
+  <button class="menu-btn" type="button" aria-expanded="false" aria-controls="tab-list" aria-label="Open menu">
+    <svg width="26" height="20" viewBox="0 0 26 20" aria-hidden="true"><path d="M2 2h22M2 10h22M2 18h22" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+    <span class="menu-label">{tabs.find((t) => t.id === current)?.label}</span>
+  </button>
   <button class="arrow" data-dir="-1" aria-label="Scroll tabs left" type="button">&lt;</button>
-  <div class="tabs-scroll">
+  <div class="tabs-scroll" id="tab-list">
     {tabs.map((t) => (
       <a class="tab" href={t.href} aria-current={t.id === current ? 'page' : undefined}>{t.label}</a>
     ))}
@@ -37,27 +41,42 @@ const { tabs, current } = Astro.props;
   // ── Swap only the content area when a tab is clicked (header + tab bar stay put) ──
   const main = document.querySelector<HTMLElement>('main.content')!;
   const links = [...document.querySelectorAll<HTMLAnchorElement>('.tab')];
-  const cache = new Map<string, Promise<{ html: string; title: string }>>();
+  const cache = new Map<string, Promise<{ html: string; title: string; compact: boolean }>>();
 
   const load = (url: string) => {
     if (!cache.has(url)) {
       cache.set(url, fetch(url).then(async (r) => {
         if (!r.ok) throw new Error(String(r.status));
         const doc = new DOMParser().parseFromString(await r.text(), 'text/html');
-        return { html: doc.querySelector('main.content')!.innerHTML, title: doc.title };
+        return { html: doc.querySelector('main.content')!.innerHTML, title: doc.title, compact: doc.body.classList.contains('compact') };
       }).catch((e) => { cache.delete(url); throw e; }));
     }
     return cache.get(url)!;
   };
   const key = (u: string) => new URL(u, location.href).pathname;
 
+  // ── ☰ menu (navPosition: menu) ──
+  const menuBtn = document.querySelector<HTMLButtonElement>('.menu-btn')!;
+  const nav2 = document.querySelector<HTMLElement>('.tabs')!;
+  const setMenu = (open: boolean) => {
+    nav2.classList.toggle('open', open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+    menuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  };
+  menuBtn.addEventListener('click', (e) => { e.stopPropagation(); setMenu(!nav2.classList.contains('open')); });
+  document.addEventListener('click', (e) => { if (!nav2.contains(e.target as Node)) setMenu(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { setMenu(false); menuBtn.focus(); } });
+  links.forEach((a) => a.addEventListener('click', () => setMenu(false)));
+
   const setActive = (path: string) => {
     links.forEach((a) => {
       if (key(a.href) === path) a.setAttribute('aria-current', 'page');
       else a.removeAttribute('aria-current');
     });
-    links.find((a) => a.getAttribute('aria-current'))
-      ?.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth' });
+    const cur = links.find((a) => a.getAttribute('aria-current'));
+    const lbl = nav2.querySelector('.menu-label');
+    if (cur && lbl) lbl.textContent = cur.textContent;
+    cur?.scrollIntoView({ inline: 'nearest', block: 'nearest', behavior: 'smooth' });
   };
 
   let token = 0;
@@ -66,17 +85,22 @@ const { tabs, current } = Astro.props;
     const path = key(url);
     setActive(path);                       // underline moves immediately
     main.classList.add('swapping');        // fade out
+    document.querySelector('.profile')?.classList.add('swapping');
     try {
       const [page] = await Promise.all([load(url), new Promise((r) => setTimeout(r, 140))]);
       if (me !== token) return;            // a newer click won
       main.innerHTML = page.html;
+      document.body.classList.toggle('compact', page.compact);   // header on/off for this page
       document.title = page.title;
       if (push) history.pushState({ tab: true }, '', url);
     } catch {
       location.href = url;                 // fall back to a normal page load
       return;
     }
-    requestAnimationFrame(() => main.classList.remove('swapping'));
+    requestAnimationFrame(() => {
+      main.classList.remove('swapping');
+      document.querySelector('.profile')?.classList.remove('swapping');
+    });
   }
 
   links.forEach((a) => {

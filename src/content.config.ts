@@ -4,7 +4,11 @@ import { glob } from 'astro/loaders';
 // Every file in content/pages/*.md is a page (tab). Order is set in content/site.yaml.
 const pages = defineCollection({
   loader: glob({ pattern: '*.md', base: './content/pages' }),
-  schema: z.object({ title: z.string().optional() }),
+  schema: z.object({
+    title: z.string().optional(),     // tab label
+    compact: z.boolean().optional(),  // true = hide photo/bio/socials, show `heading` instead
+    heading: z.string().optional(),   // big title on compact pages (defaults to `title`)
+  }),
 });
 
 // The bio shown in the header on every page.

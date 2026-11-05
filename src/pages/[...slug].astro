@@ -25,8 +25,14 @@ export async function getStaticPaths() {
 }
 
 const { entry, tabs, current } = Astro.props;
+// Home (first page in site.yaml) keeps the full header. Every other page uses the compact layout
+// (big title + orange line) unless it sets `compact: false` in its frontmatter.
+const isHome = current === loadSite().pages[0];
+const compact = entry.data.compact ?? !isHome;
+const label = entry.data.title ?? current;
+const heading = entry.data.heading ?? label.charAt(0).toUpperCase() + label.slice(1);
 const { Content } = await render(entry);
 ---
-<Layout tabs={tabs} current={current} title={entry.data.title}>
+<Layout tabs={tabs} current={current} title={entry.data.title} compact={compact} heading={heading}>
   <Content />
 </Layout>

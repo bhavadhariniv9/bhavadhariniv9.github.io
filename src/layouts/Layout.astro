@@ -1,10 +1,10 @@
 ---
 import '../styles/global.css';
-import { loadSite } from '../lib';
+import { loadSite, asset } from '../lib';
 import Profile from '../components/Profile.astro';
 import TabNav from '../components/TabNav.astro';
-interface Props { tabs: { id: string; label: string; href: string }[]; current: string; title?: string }
-const { tabs, current, title } = Astro.props;
+interface Props { tabs: { id: string; label: string; href: string }[]; current: string; title?: string; compact?: boolean; heading?: string }
+const { tabs, current, title, compact = false, heading } = Astro.props;
 const site = loadSite();
 const pageTitle = title && title !== tabs[0]?.label ? `${title} · ${site.tagline ?? site.name}` : (site.tagline ?? site.name);
 ---
@@ -15,14 +15,21 @@ const pageTitle = title && title !== tabs[0]?.label ? `${title} · ${site.taglin
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="theme-color" content="#faf2e3" />
+    <link rel="icon" type="image/png" href={asset('favicon.png')} />
+    <link rel="apple-touch-icon" href={asset('apple-touch-icon.png')} />
     <link rel="canonical" href={Astro.url.href} />
   </head>
-  <body>
+  <body class:list={[`mode-${site.navPosition ?? "top"}`, { compact }]}>
     <div class="wrap">
       <Profile />
       <hr class="rule" />
-      <TabNav tabs={tabs} current={current} />
-      <main class="content"><slot /></main>
+      <div class:list={['body', `nav-${site.navPosition ?? 'top'}`]}>
+        <TabNav tabs={tabs} current={current} />
+        <main class="content">
+          {compact && <h1 class="page-title">{heading}</h1>}
+          <slot />
+        </main>
+      </div>
     </div>
     <script>
       // [+] Synopsis toggles
@@ -34,7 +41,7 @@ const pageTitle = title && title !== tabs[0]?.label ? `${title} · ${site.taglin
         const open = panel.hidden;
         panel.hidden = !open;
         btn.setAttribute('aria-expanded', String(open));
-        btn.textContent = open ? '[−] Synopsis' : '[+] Synopsis';
+        btn.textContent = `${open ? '[−]' : '[+]'} ${btn.dataset.label ?? 'Synopsis'}`;
       });
     </script>
   </body>

@@ -2,8 +2,8 @@
 #  Site settings. This is the one file that controls the layout.
 # ─────────────────────────────────────────────────────────────
 
-name: Bhavadharni V          # big heading in the header
-tagline: Bhavadharni V       # browser tab title / SEO
+name: Bhavadharini V          # big heading in the header
+tagline: Bhavadharini V       # browser tab title / SEO
 photo: images/profile.jpg    # file inside /public
 
 # Tabs, in the order they appear. Each entry is a file in content/pages/
@@ -11,19 +11,27 @@ photo: images/profile.jpg    # file inside /public
 # More than fit on screen? Left/right arrow buttons appear automatically.
 pages:
   - home
-  - publication
-  - courses
+  - experience
+  - extras
+  # - publication    # hidden for now (content/pages/publication.md is kept)
+  # - courses        # hidden for now (content/pages/courses.md is kept)
+
+# How the tab menu looks:
+#   menu  - a ☰ button in the top-left corner that pops open a list of pages
+#   left  - a sidebar on the left   (phones: scrollable row)
+#   top   - a centred row under the header with < > scroll arrows
+navPosition: menu
 
 # Social icons. `icon` is an image inside /public (any png/svg/jpg).
 # `url` can be a web link or an email:  mailto:you@example.com
 # Add, remove or reorder freely.
 socials:
-  - label: Instagram
-    icon: icons/instagram.png
-    url: https://instagram.com/your-handle        # TODO: replace
+  - label: Email
+    icon: icons/email.svg
+    url: mailto:bhavadhariniv@iitb.ac.in
   - label: LinkedIn
-    icon: icons/linkedin.png
-    url: https://www.linkedin.com/in/your-handle  # TODO: replace
+    icon: icons/linkedin.svg
+    url: https://www.linkedin.com/in/bhavadharini-vaitheeswaran-10a186237/
   - label: GitHub
-    icon: icons/github.png
-    url: https://github.com/bhavadhariniv9          # TODO: check
+    icon: icons/github.svg
+    url: https://github.com/bhavadhariniv9

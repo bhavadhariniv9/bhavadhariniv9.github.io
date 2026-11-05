@@ -8,7 +8,7 @@ const { Content } = bio ? await render(bio) : { Content: null };
 ---
 <header class="profile">
   <div class="profile-text">
-    <h1>{site.name}</h1>
+    <h1>{site.name}{site.nameIcon && <img class="name-icon" src={asset(site.nameIcon)} alt="" />}</h1>
     <div class="bio">{Content && <Content />}</div>
   </div>
   <div class="profile-side">
