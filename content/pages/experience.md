@@ -8,7 +8,7 @@ title: experience
   Anything written inside the block becomes the collapsible "[+] Synopsis" text.
 -->
 
-:::exp{role="Pre-doctoral Researcher at Trust Lab, IIT Bombay" dates="Sept 2024 – Present" supervisor="Dr. Sruthi Sekar and Dr. Chethan Kamath" dept="Department of Computer Science, Indian Institute of Technology, Bombay" topic="Theoretical Cryptography"}
+:::exp{role="Pre-doctoral Researcher at Trust Lab, IIT Bombay" dates="Sept 2024 – Dec 2025" supervisor="Dr. Sruthi Sekar and Dr. Chethan Kamath" dept="Department of Computer Science, Indian Institute of Technology, Bombay" topic="Theoretical Cryptography"}
 :::
 
 :::exp{role="Master's Thesis at IIT Madras" dates="Aug 2023 – May 2024" supervisor="Dr. Aishwarya Thiruvengadam" dept="Department of Computer Science, Indian Institute of Technology, Madras" topic="Private Information Retrieval and Its Connection to Other Cryptographic Primitives"}
